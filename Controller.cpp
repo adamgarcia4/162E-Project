@@ -33,6 +33,11 @@ unsigned long Controller::getRefreshRate() {
    return m_loopDuration;
 }
 
+void Controller::updateTickCount(int tickNum){
+   m_tickCount = tickNum;
+   Serial.println(m_tickCount);
+}
+
 //turn the LED on
 void Controller::on(){
 	digitalWrite(LED_PIN,HIGH); //set the pin HIGH and thus turn LED on

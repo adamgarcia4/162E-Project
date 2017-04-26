@@ -43,13 +43,13 @@ void loop(){
    m_currTime = millis();
    m_controller1->updateTimer(m_currTime);
    // Serial.println(m_controller1->readEncoder());
-   Serial.println(m_controller1->getRefreshRate());
-   Serial.println(m_numEncoder);
+   // Serial.println(m_controller1->getRefreshRate());
+   // Serial.println(m_numEncoder);
+   m_controller1->updateTickCount(m_numEncoder);
    m_numEncoder = 0;
-   delay(10000);
+   delay(5000);
 }
 
 void encoderChange() {
    m_numEncoder++;
-   Serial.println(m_numEncoder);
 }

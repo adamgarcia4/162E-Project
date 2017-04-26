@@ -8,6 +8,7 @@ public:
    int readEncoder();
    void updateTimer(unsigned long newTime);
    unsigned long getRefreshRate();
+   void updateTickCount(int tickNumyyy);
    void on();
    void off();
    void blink(int time);
