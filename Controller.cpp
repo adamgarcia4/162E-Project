@@ -1,18 +1,24 @@
 #include "Arduino.h"
 #include "Controller.h" //include the declaration for this class
+#include "Servo.h"
 
-
+// Member Vars
 int m_encoderSlot;
 unsigned long m_lastTime;
 unsigned long m_loopDuration;
 int m_tickCount;
+double m_encoderRad;
+double m_encoderRate;
+int m_motorPin;
+double m_drivingFrequency;
+Servo myServo;
 
-const int LED_PIN = 13; //use the LED @ Arduino pin 13
-
-//<<constructor>> setup the LED, make pin 13 an OUTPUT
-Controller::Controller(int pwmVal){
-   m_encoderSlot = pwmVal;
+Controller::Controller(int encoderPin, int motorPin, int cycleTime){
+   m_encoderSlot = encoderPin;
+   m_motorPin = motorPin;
+   //m_drivingFrequency = 1000 / cycleTime;
    pinMode(m_encoderSlot, INPUT);
+   myServo.attach(m_motorPin,1000,2000);
    m_lastTime = 0;
 }
 
@@ -26,6 +32,7 @@ int Controller::readEncoder() {
 
 void Controller::updateTimer(unsigned long newTime) {
    m_loopDuration = newTime - m_lastTime;
+   //Serial.println(m_loopDuration);
    m_lastTime = newTime;
 }
 
@@ -36,22 +43,33 @@ unsigned long Controller::getRefreshRate() {
 void Controller::updateTickCount(int tickNum){
    m_tickCount = tickNum;
    Serial.println(m_tickCount);
+   m_encoderRad = m_tickCount * 2 * 3.141592654 / 8;
+
+   updateEncoderRate();
 }
 
-//turn the LED on
-void Controller::on(){
-	digitalWrite(LED_PIN,HIGH); //set the pin HIGH and thus turn LED on
+void Controller::updateEncoderRate() {
+   m_encoderRate = m_encoderRad / m_loopDuration;
 }
 
-//turn the LED off
-void Controller::off(){
-	digitalWrite(LED_PIN,LOW); //set the pin LOW and thus turn LED off
+double Controller::getEncoderRate() {
+   return m_encoderRate;
 }
 
-//blink the LED in a period equal to paramterer -time.
-void Controller::blink(int time){
-	on(); 			//turn LED on
-	delay(time/2);  //wait half of the wanted period
-	off();			//turn LED off
-	delay(time/2);  //wait the last half of the wanted period
+double Controller::radToDeg(double rad) {
+   return rad * 180 / 3.141592654;
+}
+
+double Controller::getFreq() {
+  return m_drivingFrequency;
+}
+
+void Controller::driveMotor(double input){
+  if(input > 1) {
+    input = 1;
+  } else if(input < -1) {
+    input = -1;
+  }
+   double actualDutyCycle = 90 * input + 90;
+   myServo.write(actualDutyCycle);
 }

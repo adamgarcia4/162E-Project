@@ -1,41 +1,30 @@
-//// digital pin 2 has a pushbutton attached to it. Give it a name:
-//int pinNum = 2;
-//
-//// the setup routine runs once when you press reset:
-//void setup() {
-//  // initialize serial communication at 9600 bits per second:
-//  Serial.begin(9600);
-//  // make the pushbutton's pin an input:
-//  pinMode(pinNum, INPUT);
-//}
-//
-//// the loop routine runs over and over again forever:
-//void loop() {
-//  // read the input pin:
-//  int encoderState = digitalRead(pinNum);
-//  // print out the state of the button:
-//  Serial.println(encoderState);
-//  delay(1);        // delay in between reads for stability
-//}
-
 #include "Controller.h"
-#include "Servo.h"
 
 Controller* m_controller1;
 unsigned long m_currTime;
-
 volatile int m_numEncoder;
-
-
-
 
 void setup(){
   /*nothing to setup*/
-  m_controller1 = new Controller(2);
+  m_controller1 = new Controller(2, 9, 20); //ms
   Serial.begin(9600);
   attachInterrupt(digitalPinToInterrupt(2), encoderChange, CHANGE);
   m_currTime = millis();
   m_numEncoder = 0;
+  
+//  analogWrite(5,10);
+
+//  Serial.println(m_controller1->getFreq());
+//  m_controller1->driveMotor(0.5);
+}
+
+int convertVal(double input) {
+  if(input > 1) {
+    input = 1;
+  } else if(input < -1) {
+    input = -1;
+  }
+  return 90 * input + 90;
 }
 
 void loop(){
@@ -45,9 +34,15 @@ void loop(){
    // Serial.println(m_controller1->readEncoder());
    // Serial.println(m_controller1->getRefreshRate());
    // Serial.println(m_numEncoder);
-   m_controller1->updateTickCount(m_numEncoder);
+   //m_controller1->updateTickCount(m_numEncoder);
+
+  for(int i=0;i<100;i++) {
+    m_controller1->driveMotor(0.01 * i - 0.5);
+    delay(1000);
+  }
+   
    m_numEncoder = 0;
-   delay(5000);
+   delay(20);
 }
 
 void encoderChange() {

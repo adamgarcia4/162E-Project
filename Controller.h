@@ -3,15 +3,20 @@
 
 class Controller {
 public:
-   Controller(int pwmVal);
+   Controller(int encoderPin, int motorPin, int cycleTime);
    ~Controller();
    int readEncoder();
    void updateTimer(unsigned long newTime);
    unsigned long getRefreshRate();
+   void setEncoderRate();
+   double getEncoderRate();
+   void updateEncoderRate();
    void updateTickCount(int tickNumyyy);
-   void on();
-   void off();
-   void blink(int time);
+   void driveMotor(double dutyCycle);
+   double getFreq();
+
+private:
+   double radToDeg(double rad);
 };
 
 
