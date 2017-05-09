@@ -3,9 +3,12 @@
 
 class IMU {
 public:
-   IMU();
+   IMU(float* angleArr, int fracUpdate);
    ~IMU();
+   void measureAngles();
+   void loop(float * angleArr);
    void updateAngles();
+   void printAngles();
 
 private:
 
