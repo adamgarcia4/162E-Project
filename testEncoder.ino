@@ -15,6 +15,8 @@ void setup(){
   attachInterrupt(digitalPinToInterrupt(2), encoderChange, CHANGE);
   m_currTime = millis();
   m_numEncoder = 0;
+
+  // Set the setpoint of the PID class to some arbitrary value
 }
 
 int convertVal(double input) {
@@ -39,6 +41,8 @@ void loop(){
    Serial.print(" | ");
    Serial.println(angleArr[2]);
    Serial.print(" | ");
+
+   // Print out current value to screen
 
    // Serial.println(m_controller1->readEncoder());
    // Serial.println(m_controller1->getRefreshRate());
