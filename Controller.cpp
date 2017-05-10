@@ -32,7 +32,6 @@ int Controller::readEncoder() {
 
 void Controller::updateTimer(unsigned long newTime) {
    m_loopDuration = newTime - m_lastTime;
-   //Serial.println(m_loopDuration);
    m_lastTime = newTime;
 }
 
@@ -40,16 +39,16 @@ unsigned long Controller::getRefreshRate() {
    return m_loopDuration;
 }
 
-void Controller::updateTickCount(int tickNum){
+int Controller::updateTickCount(int tickNum){
    m_tickCount = tickNum;
-   Serial.println(m_tickCount);
-   m_encoderRad = m_tickCount * 2 * 3.141592654 / 8;
+   m_encoderRad = m_tickCount * 2 * 3.141592654 / 8; //rads
 
    updateEncoderRate();
+   return m_tickCount;
 }
 
 void Controller::updateEncoderRate() {
-   m_encoderRate = m_encoderRad / m_loopDuration;
+   m_encoderRate = m_encoderRad / m_loopDuration * 1000;
 }
 
 double Controller::getEncoderRate() {
@@ -67,7 +66,7 @@ double Controller::getFreq() {
 void Controller::driveMotor(double input){
   if(input > 1) {
     input = 1;
-  } else if(input < -1) {
+} else if(input < -1) {
     input = -1;
   }
    double actualDutyCycle = 90 * input + 90;

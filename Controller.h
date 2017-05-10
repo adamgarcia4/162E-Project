@@ -11,7 +11,7 @@ public:
    void setEncoderRate();
    double getEncoderRate();
    void updateEncoderRate();
-   void updateTickCount(int tickNumyyy);
+   int updateTickCount(int tickNum);
    void driveMotor(double dutyCycle);
    double getFreq();
 
