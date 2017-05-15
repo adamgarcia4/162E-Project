@@ -13,6 +13,12 @@ int m_motorPin;
 double m_drivingFrequency;
 Servo myServo;
 
+const int numReadings = 5;
+int readings[numReadings];
+int readIndex = 0;
+int total = 0;
+int average = 0;
+
 Controller::Controller(int encoderPin, int motorPin, int cycleTime){
    m_encoderSlot = encoderPin;
    m_motorPin = motorPin;
@@ -20,6 +26,11 @@ Controller::Controller(int encoderPin, int motorPin, int cycleTime){
    pinMode(m_encoderSlot, INPUT);
    myServo.attach(m_motorPin,1000,2000);
    m_lastTime = 0;
+
+   // Initialize boxcar array to 0
+   for(int thisReading = 0; thisReading < numReadings; thisReading++) {
+      readings[thisReading] = 0;
+   }
 }
 
 //<<destructor>>
@@ -40,9 +51,24 @@ unsigned long Controller::getRefreshRate() {
 }
 
 int Controller::updateTickCount(int tickNum){
-   m_tickCount = tickNum;
-   m_encoderRad = m_tickCount * 2 * 3.141592654 / 8; //rads
 
+   //subtract last reading
+   total = total - readings[readIndex];
+   //read from sensor
+   readings[readIndex] = tickNum;
+   // add reading to total
+   total = total + readings[readIndex];
+   //advance to next position in array
+   readIndex +=1;
+   if(readIndex >= numReadings) {
+      readIndex = 0;
+   }
+   average = total / numReadings;
+   m_tickCount = average;
+
+    //   m_tickCount = tickNum;
+   m_encoderRad = m_tickCount * 2 * 3.141592654 / 8; //rads
+   
    updateEncoderRate();
    return m_tickCount;
 }
