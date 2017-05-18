@@ -7,6 +7,7 @@ public:
    ~Controller();
    int readEncoder();
    void updateTimer(unsigned long newTime);
+   double updateRPM(double newRPM);
    unsigned long getRefreshRate();
    void setEncoderRate();
    double getEncoderRate();

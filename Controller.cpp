@@ -13,11 +13,11 @@ int m_motorPin;
 double m_drivingFrequency;
 Servo myServo;
 
-const int numReadings = 5;
-int readings[numReadings];
+const int numReadings = 1;
+double readings[numReadings];
 int readIndex = 0;
-int total = 0;
-int average = 0;
+double total = 0;
+double average = 0;
 
 Controller::Controller(int encoderPin, int motorPin, int cycleTime){
    m_encoderSlot = encoderPin;
@@ -50,12 +50,12 @@ unsigned long Controller::getRefreshRate() {
    return m_loopDuration;
 }
 
-int Controller::updateTickCount(int tickNum){
+double Controller::updateRPM(double newRPM){
 
    //subtract last reading
    total = total - readings[readIndex];
    //read from sensor
-   readings[readIndex] = tickNum;
+   readings[readIndex] = newRPM;
    // add reading to total
    total = total + readings[readIndex];
    //advance to next position in array
@@ -66,19 +66,17 @@ int Controller::updateTickCount(int tickNum){
    average = total / numReadings;
    m_tickCount = average;
 
-    //   m_tickCount = tickNum;
-   m_encoderRad = m_tickCount * 2 * 3.141592654 / 8; //rads
-   
-   updateEncoderRate();
    return m_tickCount;
 }
+
+
 
 void Controller::updateEncoderRate() {
    m_encoderRate = m_encoderRad / m_loopDuration * 1000;
 }
 
 double Controller::getEncoderRate() {
-   return m_encoderRate;
+   return m_tickCount;
 }
 
 double Controller::radToDeg(double rad) {
