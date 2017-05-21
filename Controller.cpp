@@ -10,7 +10,6 @@ int m_tickCount;
 double m_encoderRad;
 double m_encoderRate;
 int m_motorPin;
-double m_drivingFrequency;
 Servo myServo;
 
 const int numReadings = 1;
@@ -22,7 +21,6 @@ double average = 0;
 Controller::Controller(int encoderPin, int motorPin, int cycleTime){
    m_encoderSlot = encoderPin;
    m_motorPin = motorPin;
-   //m_drivingFrequency = 1000 / cycleTime;
    pinMode(m_encoderSlot, INPUT);
    myServo.attach(m_motorPin,1000,2000);
    m_lastTime = 0;
@@ -77,14 +75,6 @@ void Controller::updateEncoderRate() {
 
 double Controller::getEncoderRate() {
    return m_tickCount;
-}
-
-double Controller::radToDeg(double rad) {
-   return rad * 180 / 3.141592654;
-}
-
-double Controller::getFreq() {
-  return m_drivingFrequency;
 }
 
 void Controller::driveMotor(double input){
