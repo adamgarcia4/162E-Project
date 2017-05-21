@@ -23,6 +23,10 @@ double input, output, setpoint;
 
 bool m_lastButton = false;
 
+unsigned long currentMillis;
+unsigned long previousMillis = 0;
+unsigned long interval = 20;
+
 PID PID1(&input, &output, &setpoint, 0.0015, 0.000,0.00, DIRECT); //0.008, .8,0.00001 | .022
 //.015
 
@@ -47,7 +51,7 @@ void setup(){
 
 
    // IMU Class
-    m_imu = new IMU(angleArr, 5);
+   m_imu = new IMU(angleArr, 5);
 
 
 
@@ -56,50 +60,53 @@ void setup(){
 }
 
 void loop(){
+   currentMillis = millis();
+
+   if(currentMillis - previousMillis > interval){
+      // m_imu->readAngles();
+      m_imu->loop(angleArr);
+      Serial.print(angleArr[0]); // Rotation about Z (psi)
+      Serial.print(" | ");
+      Serial.print(angleArr[1]); // Rotation about X (theta)
+      Serial.print(" | ");
+      Serial.println(angleArr[2]); // Rotation about Y (phi)
+      Serial.print(" | ");
+
+      if(m_lastButton == false && digitalRead(2) == 1) {
+         Serial.println(digitalRead(2));
+         m_imu->reset();
+         m_lastButton = true;
+      } else if(m_lastButton == true && digitalRead(2) == 0) {
+         m_lastButton = false;
+      }
+
+      m_controller1->driveMotor((double)angleArr[1]/90);
 
 
-   // m_imu->readAngles();
-   m_imu->loop(angleArr);
-    Serial.print(angleArr[0]); // Rotation about Z (psi)
-    Serial.print(" | ");
-    Serial.print(angleArr[1]); // Rotation about X (theta)
-    Serial.print(" | ");
-    Serial.println(angleArr[2]); // Rotation about Y (phi)
-    Serial.print(" | ");
 
-    if(m_lastButton == false && digitalRead(2) == 1) {
-      Serial.println(digitalRead(2));
-      m_imu->reset();
-      m_lastButton = true;
-   } else if(m_lastButton == true && digitalRead(2) == 0) {
-    m_lastButton = false;
+      //  //TEST
+      //   m_controller1->driveMotor(0.5);
+      //   Serial.println(m_controller1->getEncoderRate());
+      //
+      // if(updateFlag) { //new value
+      //   updateFlag = false;
+      //   stallCounter = 0;
+      // } else {
+      //   stallCounter++;
+      //   if(stallCounter >=20) {
+      //     m_controller1->updateRPM(0);
+      //     stallCounter = 0;
+      //   }
+      // }
+      //
+      //        input = m_controller1->getEncoderRate();
+      //       PID1.Compute();
+      //        Serial.print(input); Serial.print(","); Serial.println(output);
+      //        m_controller1->driveMotor(output);
+      previousMillis = currentMillis;
    }
 
-  m_controller1->driveMotor((double)angleArr[1]/90);   
-
-
-
-  //  //TEST
-  //   m_controller1->driveMotor(0.5);
-  //   Serial.println(m_controller1->getEncoderRate());
-  //
-  // if(updateFlag) { //new value
-  //   updateFlag = false;
-  //   stallCounter = 0;
-  // } else {
-  //   stallCounter++;
-  //   if(stallCounter >=20) {
-  //     m_controller1->updateRPM(0);
-  //     stallCounter = 0;
-  //   }
-  // }
-//
-//        input = m_controller1->getEncoderRate();
-//       PID1.Compute();
-//        Serial.print(input); Serial.print(","); Serial.println(output);
-//        m_controller1->driveMotor(output);
-
-   delay(20); //Looping refresh rate (ms)
+   // delay(20); //Looping refresh rate (ms)
 }
 
 int convertVal(double input) {
