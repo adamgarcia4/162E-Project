@@ -1,14 +1,4 @@
 
-// IMU Class
-//  m_imu = new IMU(angleArr, 5);
-
-// m_imu->loop(angleArr);
-// Serial.print(angleArr[0]);
-// Serial.print(" | ");
-// Serial.print(angleArr[1]);
-// Serial.print(" | ");
-// Serial.println(angleArr[2]);
-// Serial.print(" | ");
 
 
 // for(int i=0;i<100;i++) {
@@ -47,3 +37,33 @@
 // m_numEncoder = 0;
 // m_currTime = millis(); //Update current time
 // m_controller1->updateTimer(m_currTime);
+
+void IMU::readAngles() {
+
+   m_sixDOF->getRawValues(m_rawData);
+
+   // for(int i=0;i<3;i++) {
+   //    m_accData[i] = m_rawData[i];
+   // }
+   // for(int i=3;i<6;i++) {
+   //    m_gyroData[i] = m_rawData[i];
+   // }
+
+   for(int i=0;i<6;i++) {
+      Serial.print(m_rawData[i]);
+      Serial.print(" | ");
+   }
+   Serial.println(' ');
+
+}
+
+//float IMU::complementary(float accAngle, gyroRate, int loopTime) {
+//
+//   float newAngle = gyroRate;
+//
+//   float dt = (float)loopTime/1000;
+//   float a = 0.98;
+//
+//   newAngle = a * (newAngle + gyroRate * dt) + (1-a) * accAngle;
+//
+//}
