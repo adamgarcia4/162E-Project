@@ -10,7 +10,7 @@ int m_tickCount;
 double m_encoderRad;
 double m_encoderRate;
 int m_motorPin;
-Servo myServo;
+// Servo* myServo;
 
 const int numReadings = 1;
 double readings[numReadings];
@@ -22,7 +22,9 @@ Controller::Controller(int encoderPin, int motorPin, int cycleTime){
    m_encoderSlot = encoderPin;
    m_motorPin = motorPin;
    pinMode(m_encoderSlot, INPUT);
-   myServo.attach(m_motorPin,1000,2000);
+   myServo = new Servo();
+   Serial.println(m_motorPin);
+   myServo->attach(m_motorPin,1000,2000);
    m_lastTime = 0;
 
    // Initialize boxcar array to 0
@@ -88,5 +90,9 @@ void Controller::driveMotor(double input){
      input = 0.04;
  }
    double actualDutyCycle = 90 * input + 90;
-   myServo.write(actualDutyCycle);
+   myServo->write(actualDutyCycle);
+}
+
+bool Controller::attached() {
+   return myServo->attached();
 }

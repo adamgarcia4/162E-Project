@@ -37,7 +37,7 @@ void setup(){
 
    // Motor Controller / Encoder Class
    m_controller1 = new Controller(2, 6, 20); //(EncoderPin, MotorPin, Cycletime)
-    m_controller2 = new Controller(3, 10, 20); //(EncoderPin, MotorPin, Cycletime)
+    m_controller2 = new Controller(3, 9, 20); //(EncoderPin, MotorPin, Cycletime)
    attachInterrupt(digitalPinToInterrupt(2), encoderPolarityChange, CHANGE); //Encoder Interrupt function
    m_numEncoder = 0; //Storage mechanism for Encoder temporary Bucket routine
 
@@ -65,15 +65,17 @@ void loop(){
    if(currentMillis - previousMillis > interval){
       // m_imu->readAngles();
       m_imu->loop(angleArr);
-      Serial.print(angleArr[0]); // Rotation about Z (psi)
-      Serial.print(" | ");
-      Serial.print(angleArr[1]); // Rotation about X (theta)
-      Serial.print(" | ");
-      Serial.println(angleArr[2]); // Rotation about Y (phi)
-      Serial.print(" | ");
+      // Serial.print(angleArr[0]); // Rotation about Z (psi)
+      // Serial.print(" | ");
+      // Serial.print(angleArr[1]); // Rotation about X (theta)
+      // Serial.print(" | ");
+      // Serial.println(angleArr[2]); // Rotation about Y (phi)
+      // Serial.print(" | ");
 
       if(m_lastButton == false && digitalRead(2) == 1) {
          Serial.println(digitalRead(2));
+         Serial.println(m_controller1->attached());
+         Serial.println(m_controller2->attached());
          m_imu->reset();
          m_lastButton = true;
       } else if(m_lastButton == true && digitalRead(2) == 0) {
@@ -81,7 +83,7 @@ void loop(){
       }
 
       m_controller1->driveMotor((double)angleArr[1]/90);
-      m_controller2->driveMotor((double)angleArr[1]/90);
+      m_controller2->driveMotor((double)angleArr[2]/90);
 
 
 
