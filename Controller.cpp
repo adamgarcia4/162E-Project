@@ -83,6 +83,10 @@ void Controller::driveMotor(double input){
 } else if(input < -1) {
     input = -1;
   }
+
+  if (input > 0 && input < 0.04){
+     input = 0.04;
+ }
    double actualDutyCycle = 90 * input + 90;
    myServo.write(actualDutyCycle);
 }

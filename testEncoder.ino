@@ -6,7 +6,7 @@
 //#include "Autotune.h"
 
 Controller* m_controller1;
-//Controller* m_controller2;
+Controller* m_controller2;
 IMU* m_imu;
 unsigned long m_currTime;
 volatile int m_numEncoder;
@@ -36,8 +36,8 @@ void setup(){
    delay(20); //Delay to ensure that Serial Output established
 
    // Motor Controller / Encoder Class
-   m_controller1 = new Controller(2, 9, 20); //(EncoderPin, MotorPin, Cycletime)
-   //  m_controller2 = new Controller(3, 6, 20); //(EncoderPin, MotorPin, Cycletime)
+   m_controller1 = new Controller(2, 6, 20); //(EncoderPin, MotorPin, Cycletime)
+    m_controller2 = new Controller(3, 10, 20); //(EncoderPin, MotorPin, Cycletime)
    attachInterrupt(digitalPinToInterrupt(2), encoderPolarityChange, CHANGE); //Encoder Interrupt function
    m_numEncoder = 0; //Storage mechanism for Encoder temporary Bucket routine
 
@@ -81,6 +81,7 @@ void loop(){
       }
 
       m_controller1->driveMotor((double)angleArr[1]/90);
+      m_controller2->driveMotor((double)angleArr[1]/90);
 
 
 
