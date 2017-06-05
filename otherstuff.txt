@@ -1,0 +1,69 @@
+
+
+
+// for(int i=0;i<100;i++) {
+//   m_controller1->driveMotor(0.01 * i - 0.5);
+//   delay(1000);
+// }
+
+
+
+// Serial.println(m_controller1->getEncoderRate());
+
+//     input = m_controller1->getEncoderRate();
+//     Serial.println(input);
+//     PID1.Compute();
+//      Serial.print(input); Serial.print(","); Serial.println(output);
+//   //   Serial.println(m_controller1->getEncoderRate());
+//      m_controller1->driveMotor(output);
+
+
+// for(int i=0;i<100;i++) {
+//    m_controller1->driveMotor(0.5*i-0.5);
+//    delay(2000);
+//    // m_controller1->driveMotor(-1);
+//    // delay(2000);
+// }
+//   m_controller1->driveMotor(0.7);
+
+//   Serial.println(m_controller1->readEncoder());
+
+//    Serial.println(m_controller1->getEncoderRate());
+//
+//
+
+
+// m_controller1->updateTickCount(m_numEncoder);
+// m_numEncoder = 0;
+// m_currTime = millis(); //Update current time
+// m_controller1->updateTimer(m_currTime);
+
+void IMU::readAngles() {
+
+   m_sixDOF->getRawValues(m_rawData);
+
+   // for(int i=0;i<3;i++) {
+   //    m_accData[i] = m_rawData[i];
+   // }
+   // for(int i=3;i<6;i++) {
+   //    m_gyroData[i] = m_rawData[i];
+   // }
+
+   for(int i=0;i<6;i++) {
+      Serial.print(m_rawData[i]);
+      Serial.print(" | ");
+   }
+   Serial.println(' ');
+
+}
+
+//float IMU::complementary(float accAngle, gyroRate, int loopTime) {
+//
+//   float newAngle = gyroRate;
+//
+//   float dt = (float)loopTime/1000;
+//   float a = 0.98;
+//
+//   newAngle = a * (newAngle + gyroRate * dt) + (1-a) * accAngle;
+//
+//}

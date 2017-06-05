@@ -2,74 +2,54 @@
 #include "Controller.h" //include the declaration for this class
 #include "Servo.h"
 
-// Member Vars
-int m_encoderSlot;
-unsigned long m_lastTime;
-unsigned long m_loopDuration;
-int m_tickCount;
-double m_encoderRad;
-double m_encoderRate;
-int m_motorPin;
-double m_drivingFrequency;
-Servo myServo;
-
 Controller::Controller(int encoderPin, int motorPin, int cycleTime){
    m_encoderSlot = encoderPin;
    m_motorPin = motorPin;
-   //m_drivingFrequency = 1000 / cycleTime;
    pinMode(m_encoderSlot, INPUT);
-   myServo.attach(m_motorPin,1000,2000);
+   myServo = new Servo();
+   Serial.println(m_motorPin);
+   myServo->attach(m_motorPin,1000,2000);
    m_lastTime = 0;
 }
 
 //<<destructor>>
-Controller::~Controller(){/*nothing to destruct*/}
+Controller::~Controller(){
 
-
-int Controller::readEncoder() {
-  return digitalRead(m_encoderSlot);
-}
-
-void Controller::updateTimer(unsigned long newTime) {
-   m_loopDuration = newTime - m_lastTime;
-   //Serial.println(m_loopDuration);
-   m_lastTime = newTime;
-}
-
-unsigned long Controller::getRefreshRate() {
-   return m_loopDuration;
-}
-
-void Controller::updateTickCount(int tickNum){
-   m_tickCount = tickNum;
-   Serial.println(m_tickCount);
-   m_encoderRad = m_tickCount * 2 * 3.141592654 / 8;
-
-   updateEncoderRate();
-}
-
-void Controller::updateEncoderRate() {
-   m_encoderRate = m_encoderRad / m_loopDuration;
-}
-
-double Controller::getEncoderRate() {
-   return m_encoderRate;
-}
-
-double Controller::radToDeg(double rad) {
-   return rad * 180 / 3.141592654;
-}
-
-double Controller::getFreq() {
-  return m_drivingFrequency;
 }
 
 void Controller::driveMotor(double input){
-  if(input > 1) {
-    input = 1;
-  } else if(input < -1) {
-    input = -1;
-  }
+   if(input > 1) {
+      input = 1;
+   } else if(input < -1) {
+      input = -1;
+   }
+
+   if (input > 0 && input < 0.04){
+      input = 0.04;
+   }
    double actualDutyCycle = 90 * input + 90;
-   myServo.write(actualDutyCycle);
+   myServo->write(actualDutyCycle);
+}
+
+// double Controller::updateRPM(double newRPM){
+// 
+//    //subtract last reading
+//    total = total - readings[readIndex];
+//    //read from sensor
+//    readings[readIndex] = newRPM;
+//    // add reading to total
+//    total = total + readings[readIndex];
+//    //advance to next position in array
+//    readIndex +=1;
+//    if(readIndex >= numReadings) {
+//       readIndex = 0;
+//    }
+//    average = total / numReadings;
+//    m_tickCount = average;
+//
+//    return m_tickCount;
+// }
+
+bool Controller::attached() {
+   return myServo->attached();
 }
