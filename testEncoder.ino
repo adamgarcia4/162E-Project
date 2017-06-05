@@ -1,36 +1,31 @@
 #include "Controller.h"
 #include "IMU.h"
-// #include "SynchPID.h"
-#include <PID_v1.h>
 #include <stdio.h>
-//#include "Autotune.h"
 
+// Initialize Controller and IMU object pointers.
 Controller* m_controller1;
 Controller* m_controller2;
 IMU* m_imu;
-unsigned long m_currTime;
-volatile int m_numEncoder;
+
+// Encoder Stuff
 volatile long m_microsTime;
 volatile long m_lastMicrosTime;
 volatile long m_timeElapsed;
 volatile double m_motorRPM;
 
-volatile bool updateFlag;
-int stallCounter = 0;
-
+// IMU Stuff
 float angleArr[3];
-double input, output, setpoint;
 
+// Reset Button Stuff
 bool m_lastButton = false;
 
+// Looping Stuff
 unsigned long currentMillis;
 unsigned long previousMillis = 0;
 unsigned long interval = 20;
 
-PID PID1(&input, &output, &setpoint, 0.0015, 0.000,0.00, DIRECT); //0.008, .8,0.00001 | .022
-//.015
-
 void setup(){
+
    // Preprocessing functions
    Serial.begin(9600); //Begin Serial Output
    delay(20); //Delay to ensure that Serial Output established
@@ -38,22 +33,12 @@ void setup(){
    // Motor Controller / Encoder Class
    m_controller1 = new Controller(2, 6, 20); //(EncoderPin, MotorPin, Cycletime)
     m_controller2 = new Controller(3, 9, 20); //(EncoderPin, MotorPin, Cycletime)
-   attachInterrupt(digitalPinToInterrupt(2), encoderPolarityChange, CHANGE); //Encoder Interrupt function
-   m_numEncoder = 0; //Storage mechanism for Encoder temporary Bucket routine
-
-   //initialize PID stuff
-   setpoint = 200;
-   PID1.SetMode(AUTOMATIC);
-   PID1.SetOutputLimits(0,1);
-   PID1.SetSampleTime(200);
-   //  input = 0;
-   updateFlag = false;
+   // attachInterrupt(digitalPinToInterrupt(2), encoderPolarityChange, CHANGE); //Encoder Interrupt function
+   // m_numEncoder = 0; //Storage mechanism for Encoder temporary Bucket routine
 
 
    // IMU Class
    m_imu = new IMU(angleArr, 5);
-
-
 
    // Final Setup Delay
    delay(20);
@@ -61,65 +46,32 @@ void setup(){
 
 void loop(){
    currentMillis = millis();
-
+//    Serial.println("bye");
    if(currentMillis - previousMillis > interval){
-      // m_imu->readAngles();
-      m_imu->loop(angleArr);
-      // Serial.print(angleArr[0]); // Rotation about Z (psi)
-      // Serial.print(" | ");
-      // Serial.print(angleArr[1]); // Rotation about X (theta)
-      // Serial.print(" | ");
-      // Serial.println(angleArr[2]); // Rotation about Y (phi)
-      // Serial.print(" | ");
+//      Serial.println("hi");
+//      Serial.println(digitalRead(2));
+      // To print values to console, pass in a 1.  Else, 0.
+      m_imu->loop(angleArr, 0);
 
+      // If reset button just pressed, reset IMU zero.
       if(m_lastButton == false && digitalRead(2) == 1) {
          Serial.println(digitalRead(2));
-         Serial.println(m_controller1->attached());
-         Serial.println(m_controller2->attached());
+//         Serial.println(m_controller1->attached());
+//         Serial.println(m_controller2->attached());
          m_imu->reset();
          m_lastButton = true;
       } else if(m_lastButton == true && digitalRead(2) == 0) {
          m_lastButton = false;
       }
 
-      m_controller1->driveMotor((double)angleArr[1]/90);
-      m_controller2->driveMotor((double)angleArr[2]/90);
+      // Drive motors with given proportional power
+      m_controller1->driveMotor(-(double)angleArr[1]/45);
+      m_controller2->driveMotor(-(double)angleArr[2]/45);
 
-
-
-      //  //TEST
-      //   m_controller1->driveMotor(0.5);
-      //   Serial.println(m_controller1->getEncoderRate());
-      //
-      // if(updateFlag) { //new value
-      //   updateFlag = false;
-      //   stallCounter = 0;
-      // } else {
-      //   stallCounter++;
-      //   if(stallCounter >=20) {
-      //     m_controller1->updateRPM(0);
-      //     stallCounter = 0;
-      //   }
-      // }
-      //
-      //        input = m_controller1->getEncoderRate();
-      //       PID1.Compute();
-      //        Serial.print(input); Serial.print(","); Serial.println(output);
-      //        m_controller1->driveMotor(output);
+      // Reset millis to check in next loop
       previousMillis = currentMillis;
    }
 
-   // delay(20); //Looping refresh rate (ms)
-}
-
-int convertVal(double input) {
-   if(input > 1) {
-      input = 1;
-   } else if(input < -1) {
-      input = -1;
-   }
-
-   return 90 * input + 90;
 }
 
 void encoderPolarityChange() {
@@ -128,8 +80,5 @@ void encoderPolarityChange() {
    m_timeElapsed = m_microsTime - m_lastMicrosTime;
 
    m_motorRPM = 0.125 / m_timeElapsed * 1000 * 60;
-   m_controller1->updateRPM(m_motorRPM);
-   updateFlag = true;
-
-   // m_numEncoder++;
+//   m_controller1->updateRPM(m_motorRPM);
 }

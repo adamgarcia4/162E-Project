@@ -5,7 +5,7 @@ class IMU {
 public:
    IMU(float* angleArr, int fracUpdate);
    ~IMU();
-   void loop(float * angleArr);
+   void loop(float * angleArr, bool shouldPrint);
    void reset();
    // void readAngles();
    // void measureAngles();
